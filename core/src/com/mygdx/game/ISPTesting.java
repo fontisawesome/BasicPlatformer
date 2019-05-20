@@ -60,7 +60,7 @@ public class ISPTesting extends ApplicationAdapter {
 		FixtureDef groundFixDef = new FixtureDef();
 		groundFixDef.shape = groundShape;
 		groundFixDef.friction = 0.5f;
-		groundFixDef.restitution = 0;
+		groundFixDef.restitution = 0.3f;
 		ground = world.createBody(groundDef);
 		Fixture groundFix = ground.createFixture(groundFixDef);
 
@@ -73,14 +73,26 @@ public class ISPTesting extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		debug.render(world, camera.combined);
 		if (Gdx.input.isKeyPressed(Input.Keys.D) && slime.getLinearVelocity().x < maximumVelocity) {
-				slime.applyLinearImpulse(2,0, slime.getPosition().x, slime.getPosition().y, true);
+		    if (Math.abs(slime.getPosition().y-0.5f) >= 0.5f){
+                if (slime.getLinearVelocity().x < (maximumVelocity/2))
+                    slime.applyLinearImpulse(0.5f, 0, slime.getPosition().x, slime.getPosition().y, true);
+            }
+		    else {
+                slime.applyLinearImpulse(1, 0, slime.getPosition().x, slime.getPosition().y, true);
+            }
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.A)&& slime.getLinearVelocity().x > -1*maximumVelocity) {
-			slime.applyLinearImpulse(-2,0, slime.getPosition().x, slime.getPosition().y, true);
+            if (Math.abs(slime.getPosition().y-0.5f) >= 0.5f){
+                if (slime.getLinearVelocity().x > -1*(maximumVelocity/2))
+                    slime.applyLinearImpulse(-0.5f, 0, slime.getPosition().x, slime.getPosition().y, true);
+            }
+            else {
+                slime.applyLinearImpulse(-1, 0, slime.getPosition().x, slime.getPosition().y, true);
+            }
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
 			if (Math.abs(slime.getPosition().y-0.5f) < 0.02){
-				slime.applyLinearImpulse(0,6, slime.getPosition().x, slime.getPosition().y, true);
+				slime.applyLinearImpulse(0,10, slime.getPosition().x, slime.getPosition().y, true);
 			}
 		}
 		System.out.println(slime.getPosition().x + " " + slime.getPosition().y);
