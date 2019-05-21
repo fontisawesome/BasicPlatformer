@@ -63,8 +63,8 @@ public class ISPTesting extends ApplicationAdapter {
 	}
 	@Override
 	public void create () {
-		maximumVelocity = 10;
-		maximumVelocityY = 5;
+		maximumVelocity = 15;
+		maximumVelocityY = 10;
 		t = new Terrain();
 		System.out.println(t.uheights[0]);
 		world = new World(new Vector2(0, -10), true);
@@ -117,12 +117,21 @@ public class ISPTesting extends ApplicationAdapter {
 					if (contact.getFixtureA().equals(groundFix) && contact.getFixtureB().equals(slimeFix)){
 						touchingFaces--;
 					}
+
 				}
 
 				@Override
 				public void beginContact(Contact contact) {
 					if (contact.getFixtureA().equals(groundFix) && contact.getFixtureB().equals(slimeFix)){
 						touchingFaces++;
+					}
+					if (contact.getFixtureA().equals(slimeFix) && contact.getFixtureB().equals(ballFix)){
+						if (slime.getPosition().x < ball.getPosition().x){
+							slime.applyLinearImpulse(-100,100,slime.getPosition().x, slime.getPosition().y, true);
+						}
+						else if(slime.getPosition().x > ball.getPosition().x){
+							slime.applyLinearImpulse(100, 100, slime.getPosition().x, slime.getPosition().y, true);
+						}
 					}
 				}
 		});
@@ -152,8 +161,8 @@ public class ISPTesting extends ApplicationAdapter {
 		debug.render(world, camera.combined);
 		touchingGround = touchingFaces > 0 && touchingFaces<=2;
 		if (Gdx.input.isKeyPressed(Input.Keys.D) && slime.getLinearVelocity().x < maximumVelocity) {
-		    if (!touchingGround){
-                if (slime.getLinearVelocity().x < (maximumVelocity/3))
+		    if (touchingFaces == 0){
+                if (slime.getLinearVelocity().x < (maximumVelocity/2))
                     slime.applyLinearImpulse(0.5f, 0, slime.getPosition().x, slime.getPosition().y, true);
             }
 		    else {
@@ -161,8 +170,8 @@ public class ISPTesting extends ApplicationAdapter {
             }
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.A)&& slime.getLinearVelocity().x > -1*maximumVelocity) {
-            if (!touchingGround){
-                if (slime.getLinearVelocity().x > -1*(maximumVelocity/3))
+            if (touchingFaces == 0){
+                if (slime.getLinearVelocity().x > -1*(maximumVelocity/2))
                     slime.applyLinearImpulse(-0.5f, 0, slime.getPosition().x, slime.getPosition().y, true);
             }
             else {
@@ -171,20 +180,31 @@ public class ISPTesting extends ApplicationAdapter {
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
 			if (touchingGround && slime.getLinearVelocity().y < maximumVelocityY){
-				slime.applyLinearImpulse(0,3, slime.getPosition().x, slime.getPosition().y, true);
+				slime.applyLinearImpulse(0,5, slime.getPosition().x, slime.getPosition().y, true);
 			}
 		}
+		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
 
-//		if (TimeUtils.nanoTime()-lastBallNano > 2000000000){
-//			if (ball != null)
-//				world.destroyBody(ball);
-//			spawnBall();
-//			lastBallNano = TimeUtils.nanoTime();
-//		}
-		if (slime.getPosition().y < -10){
+				slime.applyLinearImpulse(0,-5, slime.getPosition().x, slime.getPosition().y, true);
+
+		}
+
+		if (TimeUtils.nanoTime()-lastBallNano > 2000000000){
+			if (ball != null)
+				world.destroyBody(ball);
+			spawnBall();
+			lastBallNano = TimeUtils.nanoTime();
+		}
+		if (slime.getPosition().y < -10 || slime.getPosition().y > 20 || slime.getPosition().x > 30 || slime.getPosition().x < -30){
 			hide();
 		}
 		System.out.println(touchingFaces);
+		if (ball.getPosition().x < slime.getPosition().x && Math.abs(ball.getLinearVelocity().x) < maximumVelocity/4){
+			ball.applyLinearImpulse(2,0,ball.getPosition().x, ball.getPosition().y, true);
+		}
+		else if (ball.getPosition().x > slime.getPosition().x && Math.abs(ball.getLinearVelocity().x) < maximumVelocity/4){
+			ball.applyLinearImpulse(-2,0,ball.getPosition().x, ball.getPosition().y, true);
+		}
 		world.step(1/60f, 8, 3);
 	}
 	public void hide(){
